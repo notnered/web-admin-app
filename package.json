@@ -6,17 +6,22 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "api": "node ./src/api/index.js",
+        "start": "concurrently \"vite\" \"node --watch ./src/api/index.js\""
     },
     "devDependencies": {
+        "concurrently": "^9.2.0",
         "sequelize-cli": "^6.6.3",
         "vite": "^6.3.5"
     },
     "dependencies": {
         "bcrypt": "^6.0.0",
+        "cors": "^2.8.5",
         "express": "^5.1.0",
         "jsonwebtoken": "^9.0.2",
         "sequelize": "^6.37.7",
-        "sqlite3": "^5.1.7"
+        "sqlite3": "^5.1.7",
+        "vite-express": "^0.21.1"
     }
 }
