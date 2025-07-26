@@ -11,10 +11,14 @@ export default function Auth() {
             const password = document.getElementById('password').value;
 
             const success = await login({ username, password });
-            console.log(success);
-            // if (success) {
-            //     renderRoute('list');
-            // }
+            console.log('login success:', success);
+
+            if (success) {
+                renderRoute('list');
+                if (window.renderNavBar) window.renderNavBar();
+            } else {
+                alert('Ошибка входа');
+            }
         });
     }, 0);
 
