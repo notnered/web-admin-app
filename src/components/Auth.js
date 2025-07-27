@@ -11,7 +11,7 @@ export default function Auth() {
             const password = document.getElementById('password').value;
 
             const success = await login({ username, password });
-            console.log('login success:', success);
+            // console.log('login success:', success);
 
             if (success) {
                 renderRoute('list');
@@ -23,11 +23,11 @@ export default function Auth() {
     }, 0);
 
     return `
-        <section id="auth">
-            <h2>Вход администратора</h2>
-            <input type="text" id="username" name="username" placeholder="Имя пользователя">
-            <input type="password" id="password" name="password" placeholder="Пароль">
-            <button id="btn">Войти</button>
+        <section id="auth" class="auth-section">
+            <h2 class="auth-title">Вход администратора</h2>
+            <input type="text" id="username" name="username" class="auth-input" placeholder="Имя пользователя">
+            <input type="password" id="password" name="password" class="auth-input" placeholder="Пароль">
+            <button id="btn" class="auth-button">Войти</button>
         </section>
     `;
 }
