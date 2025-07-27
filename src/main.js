@@ -1,9 +1,9 @@
 import NavBar from './components/NavBar';
 import { renderRoute, isLogged, logout } from './utils/utils';
 import './router';
-import './style.css';
+import './static/style.css';
 
-window.renderNavBar = function() {
+window.renderNavBar = function () {
     const navContainer = document.getElementById('nav-container');
     if (!navContainer) return;
 
@@ -18,7 +18,6 @@ window.renderNavBar = function() {
         });
     }
 };
-
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('#app').innerHTML = `
