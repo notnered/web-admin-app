@@ -53,9 +53,17 @@ router.post('/login', async (req, res) => {
             throw new Error('Wrong password');
         }
 
-        const token = jwt.sign({ id: userObject.id }, secret_key, {
-            expiresIn: '4h',
-        });
+        const token = jwt.sign(
+            {
+                id: userObject.id,
+                username: userObject.username,
+                role: userObject.role,
+            },
+            secret_key,
+            {
+                expiresIn: '4h',
+            }
+        );
         res.status(200).send(
             JSON.stringify({
                 token: token,
@@ -66,6 +74,18 @@ router.post('/login', async (req, res) => {
         res.status(404).send(`Error: ${err}`);
     }
 });
+
+// router.post('/jwt-payload', async (req, res) => {
+//     try {
+//         const { token } = req.body;
+//         const decodedToken = jwt.verify(token, secret_key);
+//         console.log(decodedToken);
+//         res.status(200).send();
+//     } catch (err) {
+//         console.error(err);
+//         res.status(404).send(`Error: ${err}`);
+//     }
+// })
 
 // CRUD routes
 
@@ -108,7 +128,9 @@ router.post('/users', async (req, res) => {
             throw new Error('Request body is empty');
         }
 
-        const { username, password, name } = body;
+        // console.log(body);
+
+        const { username, password, name, gender, birthdate } = body;
         if (!username || !password || !name) {
             throw new Error('Not all data provided');
         }
@@ -129,7 +151,10 @@ router.post('/users', async (req, res) => {
             password: hashedPassword,
             first_name: splitName[0],
             last_name: splitName[1] ?? '',
+            gender: gender,
+            birthdate: new Date(birthdate).toISOString(),
         });
+        // console.log('user created');
         // console.log(body, user);
         res.status(200).send(user);
     } catch (err) {
@@ -158,7 +183,7 @@ router.put('/users/:id', async (req, res) => {
             throw new Error('Request body is empty');
         }
 
-        const { username, password, name } = body;
+        const { username, password, name, gender, birthdate } = body;
         if (!username || !password || !name) {
             throw new Error('Not all data provided');
         }
@@ -173,6 +198,8 @@ router.put('/users/:id', async (req, res) => {
                 password: hashedPassword,
                 first_name: slicedName[0],
                 last_name: slicedName[1] ?? '',
+                gender: gender,
+                birthdate: new Date(birthdate).toISOString(),
             },
             {
                 where: {
@@ -183,9 +210,9 @@ router.put('/users/:id', async (req, res) => {
 
         // console.log(updatedUser);
 
-        res.status(200).send(JSON.stringify(
-            {'Message': `User ${updatedUser} updated`}
-        ));
+        res.status(200).send(
+            JSON.stringify({ Message: `User ${updatedUser} updated` })
+        );
     } catch (err) {
         console.error(err);
         res.status(400).send(`Error: ${err}`);
