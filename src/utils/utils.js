@@ -43,6 +43,28 @@ export async function renderRoute(route, payload = null, push = true) {
 
             const usersData = await fetch('http://localhost:3000/api/users');
             const usersJson = await usersData.json();
+
+            const sortField = payload?.sort;
+            const direction = payload?.direction || 'asc';
+
+            if (sortField) {
+                usersJson.sort((a, b) => {
+                    let valA = a[sortField];
+                    let valB = b[sortField];
+
+                    if (sortField === 'birthdate') {
+                        valA = new Date(valA);
+                        valB = new Date(valB);
+                    } else {
+                        valA = valA.toLowerCase();
+                        valB = valB.toLowerCase();
+                    }
+
+                    const res = valA > valB ? 1 : valA < valB ? -1 : 0;
+                    return direction === 'asc' ? res : -res;
+                });
+            }
+
             main.innerHTML = UserList(usersJson);
             break;
         case 'add':
@@ -98,11 +120,19 @@ export async function renderRoute(route, payload = null, push = true) {
     }
 
     if (push) {
-        window.history.pushState(
-            {},
-            '',
-            '/' + route + (payload ? `/${payload}` : '')
-        );
+        const url = new URL(window.location);
+        url.pathname = `/${route}`;
+
+        if (payload && typeof payload === 'object') {
+            url.search = new URLSearchParams(payload).toString();
+        } else {
+            url.search = '';
+            if (typeof payload === 'string') {
+                url.pathname += `/${payload}`;
+            }
+        }
+
+        window.history.pushState({}, '', url.toString());
     }
 }
 

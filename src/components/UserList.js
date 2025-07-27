@@ -6,6 +6,50 @@ export default function UserList(users = []) {
         const viewBtns = document.querySelectorAll('.view');
         const editBtns = document.querySelectorAll('.edit');
 
+        document
+            .getElementById('sort-username')
+            ?.addEventListener('click', () => {
+                renderRoute('list', { sort: 'username' });
+            });
+        document
+            .getElementById('sort-first_name')
+            ?.addEventListener('click', () => {
+                renderRoute('list', { sort: 'first_name' });
+            });
+        document
+            .getElementById('sort-birthdate')
+            ?.addEventListener('click', () => {
+                renderRoute('list', { sort: 'birthdate' });
+            });
+
+        const resetSortBtn = document.getElementById('reset-sort')?.addEventListener('click', () => {
+            renderRoute('list');
+        });
+
+        const params = new URLSearchParams(window.location.search);
+        const currentSort = params.get('sort');
+        const currentDirection = params.get('direction') || 'asc';
+
+        ['username', 'first_name', 'birthdate'].forEach((field) => {
+            const btn = document.getElementById(`sort-${field}`);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    const isSame = currentSort === field;
+                    const newDirection =
+                        isSame && currentDirection === 'asc' ? 'desc' : 'asc';
+                    renderRoute('list', {
+                        sort: field,
+                        direction: newDirection,
+                    });
+                });
+
+                if (currentSort === field) {
+                    btn.classList.add('active');
+                    btn.innerHTML += currentDirection === 'asc' ? ' ▲' : ' ▼';
+                }
+            }
+        });
+
         if (!deleteBtns || !viewBtns || !editBtns) return;
 
         deleteBtns.forEach((btn) =>
@@ -84,13 +128,16 @@ export default function UserList(users = []) {
 
     return `
         <section class="user-section">
-            <h2 class="user-title">Пользователи</h2>
+            <div class="user-header">
+                <h2 class="user-title">Пользователи</h2>
+                <button id="reset-sort" class="sort-reset-btn">Сбросить сортировку</button>
+            </div>
             <table class="user-table">
                 <thead>
                     <tr>
-                        <th onclick="sortBy('username')">Логин</th>
-                        <th onclick="sortBy('first_name')">Имя</th>
-                        <th onclick="sortBy('birthdate')">Дата рождения</th>
+                        <th><button id="sort-username" class="sort-btn">Логин</button></th>
+                        <th><button id="sort-first_name" class="sort-btn">Имя</button></th>
+                        <th><button id="sort-birthdate" class="sort-btn">Дата рождения</button></th>
                         <th>Действия</th>
                     </tr>
                 </thead>
