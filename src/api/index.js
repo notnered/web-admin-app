@@ -7,7 +7,7 @@ const { sequelize, connectionTest } = require('../db/db');
 const urls = require('./urls.js');
 
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:5000' }));
+app.use(cors({ origin: ['http://localhost:5000', 'http://localhost:3000', 'http://localhost:4173'] }));
 app.use('/api', urls);
 
 app.get('/', (req, res) => {

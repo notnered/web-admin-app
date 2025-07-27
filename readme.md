@@ -47,6 +47,10 @@ Access to the interface is restricted to authenticated users with admin rights.
 
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/notnered/user-admin.git
+   git clone https://github.com/notnered/web-admin-app.git
    cd user-admin
    ```
+
+2. Create `.env` file with `JWT_SECRET` field in It
+
+3. Type npm start in cmd
