@@ -9,14 +9,28 @@ export async function renderRoute(route, payload = null, push = true) {
 
     switch (route) {
         case 'list':
-            // if (!isLogged()){
-            //     main.innerHTML = Auth();
-            // }
+            if (!isLogged()){
+                renderRoute('auth', null, true);
+                return;
+            }
             const usersData = await fetch('http://localhost:3000/api/users');
             const usersJson = await usersData.json();
             main.innerHTML = UserList(usersJson);
             break;
         case 'add':
+            if (payload){
+                // console.log('edit', payload);
+                const userResponse = await fetch(`http://localhost:3000/api/users/${payload}`);
+                if (!userResponse.ok){
+                    console.error('Error:', userResponse.status);
+                    return;
+                }
+
+                const userData = await userResponse.json();
+                // console.log(userData);
+                main.innerHTML = UserForm(userData);
+                break;
+            }
             main.innerHTML = UserForm();
             break;
         case 'auth':
