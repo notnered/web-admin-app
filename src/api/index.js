@@ -14,10 +14,10 @@ app.get('/', (req, res) => {
     res.send('test test');
 });
 
-const server = app.listen(3000, async () => {
+app.listen(3000, async () => {
     try {
-        const syncResult = await sequelize.sync();
-        const connectResult = await connectionTest();
+        await sequelize.sync();
+        await connectionTest();
         console.log('listening on port 3000');
     } catch (err) {
         console.error('Startup failed! Error:', err);
