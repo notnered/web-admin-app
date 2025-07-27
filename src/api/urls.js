@@ -25,37 +25,42 @@ router.get('/', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const body = req.body;
-        if (!body){
+        if (!body) {
             throw new Error('Request body is empty');
-        };
+        }
 
         const { username, password } = body;
-        if (!username || !password ){
+        if (!username || !password) {
             throw new Error('Not all data provided');
-        };
+        }
 
         const userObject = await Users.findOne({
             where: {
                 username: username,
-            }
+            },
         });
-        if (!userObject){
+        if (!userObject) {
             throw new Error('User not found');
-        };
+        }
 
         // console.log('userObject', userObject);
 
-        const checkPassword = await bcrypt.compare(password, userObject.password);
-        if (!checkPassword){
+        const checkPassword = await bcrypt.compare(
+            password,
+            userObject.password
+        );
+        if (!checkPassword) {
             throw new Error('Wrong password');
-        };
+        }
 
         const token = jwt.sign({ id: userObject.id }, secret_key, {
             expiresIn: '4h',
         });
-        res.status(200).send(JSON.stringify({
-            "token": token,
-        }));
+        res.status(200).send(
+            JSON.stringify({
+                token: token,
+            })
+        );
     } catch (err) {
         console.error(err);
         res.status(404).send(`Error: ${err}`);
@@ -75,25 +80,45 @@ router.get('/users', async (req, res) => {
     res.end();
 });
 
+router.get('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await Users.findOne({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            res.status(404).send('User not found');
+        }
+
+        res.status(200).send(JSON.stringify(user));
+    } catch (err) {
+        console.error(err);
+        res.status(404).send(`Error: ${err}`);
+    }
+    res.end();
+});
+
 router.post('/users', async (req, res) => {
     try {
         const body = req.body;
-        console.log('key:', secret_key);
-        if (!body){
+        // console.log('key:', secret_key);
+        if (!body) {
             throw new Error('Request body is empty');
         }
 
         const { username, password, name } = body;
-        if (!username || !password || !name ){
+        if (!username || !password || !name) {
             throw new Error('Not all data provided');
         }
 
         const checkedUser = await Users.findOne({
             where: {
                 username: username,
-            }
+            },
         });
-        if (checkedUser){
+        if (checkedUser) {
             throw new Error('User with that username already exists');
         }
 
@@ -103,7 +128,7 @@ router.post('/users', async (req, res) => {
             username: username,
             password: hashedPassword,
             first_name: splitName[0],
-            last_name: splitName[1],
+            last_name: splitName[1] ?? '',
         });
         // console.log(body, user);
         res.status(200).send(user);
@@ -116,11 +141,54 @@ router.post('/users', async (req, res) => {
 router.put('/users/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        console.log('id', id);
-        res.status(200).end();
+
+        // console.log('id', id);
+
+        const user = await Users.findOne({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const body = req.body;
+        if (!body) {
+            throw new Error('Request body is empty');
+        }
+
+        const { username, password, name } = body;
+        if (!username || !password || !name) {
+            throw new Error('Not all data provided');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        const slicedName = name.split(' ');
+
+        const updatedUser = await Users.update(
+            {
+                username: username,
+                password: hashedPassword,
+                first_name: slicedName[0],
+                last_name: slicedName[1] ?? '',
+            },
+            {
+                where: {
+                    id: id,
+                },
+            }
+        );
+
+        // console.log(updatedUser);
+
+        res.status(200).send(JSON.stringify(
+            {'Message': `User ${updatedUser} updated`}
+        ));
     } catch (err) {
         console.error(err);
-        res.status(400).end(`Error: ${err}`);
+        res.status(400).send(`Error: ${err}`);
     }
 });
 
@@ -135,9 +203,9 @@ router.delete('/users/:id', async (req, res) => {
         const deletedUser = await Users.destroy({
             where: {
                 id: id,
-            }
-        })
-        if (!deletedUser){
+            },
+        });
+        if (!deletedUser) {
             throw new Error('Cant find user with that id');
         }
 
